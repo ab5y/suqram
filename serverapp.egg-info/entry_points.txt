@@ -1,0 +1,5 @@
+      [paste.app_factory]
+      main = serverapp:main
+      [console_scripts]
+      initialize_serverapp_db = serverapp.scripts.initializedb:main
+      
