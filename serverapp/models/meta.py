@@ -8,6 +8,9 @@ class Base(object):
 	def __tablename__(cls):
 		return cls.__name__.lower()
 
+	def as_dict(self):
+		return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
+
 	id = Column(Integer, primary_key=True)
 	created = Column(DateTime, default=datetime.datetime.utcnow)
 

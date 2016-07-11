@@ -10,7 +10,7 @@ from sqlalchemy.orm import relationship
 from .meta import Base
 
 class Category(Base):
-	name = Column(Text)
+	name = Column(Text, unique=True)
 	type_id = Column(Integer, ForeignKey('categorytype.id'))
 
 	category_type = relationship("CategoryType", back_populates="categories")

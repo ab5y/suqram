@@ -2,6 +2,11 @@ import os
 import sys
 import transaction
 
+from openpyxl import load_workbook
+from openpyxl.workbook import Workbook
+from openpyxl.compat import range
+from openpyxl.cell import get_column_letter
+
 from pyramid.paster import (
     get_appsettings,
     setup_logging,
@@ -20,10 +25,23 @@ from ..models import (
     User,
     UserType,
     Question,
+    Option,
     QuestionType,
     Category,
     CategoryType,
+    CategoryQuestion,
     )
+
+ROOT_FOLDER = os.path.join(os.getcwd(), 'serverapp')
+DATA_FOLDER = os.path.join(ROOT_FOLDER, 'scripts')
+EXCEL_FILE_NAME = 'PMP Questions Bank.xlsx'
+
+def get_filepath(filename):
+    return os.path.join(DATA_FOLDER, filename)
+
+def read_from(filename, sheet):
+    wb = load_workbook(filename = get_filepath(filename), read_only=True)
+    return wb[sheet]
 
 
 def usage(argv):
@@ -46,7 +64,7 @@ def main(argv=sys.argv):
 
     session_factory = get_session_factory(engine)
 
-    chapter = CategoryType(name='chapter')
+    chaptercategorytype = CategoryType(name='chapter')
     multichoice = QuestionType(name='multiplechoice')
     adminuser = UserType(name='admin')
     regularuser = UserType(name='regular')
@@ -55,12 +73,43 @@ def main(argv=sys.argv):
         print 'User Type Table: ', str(UserType.__table__)
         print 'Question Type Table', str(QuestionType.__table__)
         print 'Category Type Table', str(CategoryType.__table__)
-        dbsession.add(chapter)
+        dbsession.add(chaptercategorytype)
         dbsession.add(multichoice)
         dbsession.add(adminuser)
         dbsession.add(regularuser)
         dbsession.flush()
-        print 'Chapter is CategoryType id: ', chapter.id
+        user = User(name='admin', full_name='admin user', type_id=adminuser.id)
+        user.set_password('abc123')
+        chaptercategory = Category(name='TM', type_id=chaptercategorytype.id)
+        dbsession.add(user)
+        dbsession.add(chaptercategory)
+        dbsession.flush()
+        print 'Chapter category type is CategoryType id: ', chaptercategorytype.id
+        print 'TM Chapter category is Category id: ', chaptercategory.id
         print 'multichoice is QuestionType id: ', multichoice.id
         print 'admin is UserType id: ', adminuser.id
         print 'regular is UserType id: ', regularuser.id
+
+        # Get Questions and Options from Excel File
+        table = 'Sheet1'
+        header = 'Sl. No.'
+        ws = read_from(EXCEL_FILE_NAME, table)
+        for row in ws.rows:
+            if row[0].value != header and row[2].value != None:
+                category = row[1].value
+                question = Question(question=row[2].value, type_id=multichoice.id)
+                dbsession.add(question)
+                dbsession.flush()
+                if category == 'TM':
+                    dbsession.add(CategoryQuestion(category_id=chaptercategory.id, question_id=question.id))
+                correct_option = row[7].value
+                # print 'Correct option for question ', question.question, 'is ', correct_option
+                q_options = []
+                q_options.append(Option(option=row[3].value, question_id=question.id, isCorrectAnswer=False))
+                q_options.append(Option(option=row[4].value, question_id=question.id, isCorrectAnswer=False))
+                q_options.append(Option(option=row[5].value, question_id=question.id, isCorrectAnswer=False))
+                q_options.append(Option(option=row[6].value, question_id=question.id, isCorrectAnswer=False))
+                q_options[ord(correct_option)-65].isCorrectAnswer = True
+                dbsession.add_all(q_options)
+
+        dbsession.flush()
