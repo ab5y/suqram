@@ -1,17 +1,11 @@
 import sqlalchemy as sa
-from .. import (
-	get_engine,
-	get_session_factory,
-	get_tm_session,
-	)
-
 from ..User import User
 
 class UserRecordService(object):
 	"""docstring for UserRecordService"""
 	@classmethod
 	def all(cls, request):
-		return request.dbsession.query(User).order_by(sa.desc(User))
+		return request.dbsession.query(User).order_by(sa.desc(User.id))
 
 	@classmethod
 	def by_id(cls, id, request):

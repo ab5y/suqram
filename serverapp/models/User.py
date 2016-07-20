@@ -22,6 +22,7 @@ class User(Base):
 	user_type = relationship("UserType", back_populates="users")
 	userquestions = relationship("UserQuestion", back_populates="user")
 	usercategories = relationship("UserCategory", back_populates="user")
+	category = relationship("Category", back_populates="user")
 
 	def set_password(self, pw):
 		pwhash = bcrypt.hashpw(pw.encode('utf8'), bcrypt.gensalt())

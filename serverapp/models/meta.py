@@ -9,7 +9,7 @@ class Base(object):
 		return cls.__name__.lower()
 
 	def as_dict(self):
-		return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns}
+		return {c.name: str(getattr(self, c.name)) for c in self.__table__.columns if c.name is not 'password_hash' and c.name is not 'last_logged' and c.name is not 'created'}
 
 	id = Column(Integer, primary_key=True)
 	created = Column(DateTime, default=datetime.datetime.utcnow)

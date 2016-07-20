@@ -15,8 +15,8 @@ class OptionRecordService(object):
 		return request.dbsession.query(Option).order_by(sa.desc(Option.id))
 
 	@classmethod
-	def by_id(cls, id, request=None):
-		return Option.query.get(id)
+	def by_id(cls, id, request):
+		return request.dbsession.query(Option).get(id)
 
 	@classmethod
 	def by_question_id(cls, question_id, request):

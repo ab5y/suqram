@@ -1,7 +1,8 @@
 from pyramid.authentication import AuthTktAuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
 
-from .models.services import UserRecordService
+# from .models.services import UserRecordService
+from .models import User
 
 class AuthenticationPolicy(AuthTktAuthenticationPolicy):
 	def authenticated_userid(self, request):
@@ -12,7 +13,7 @@ class AuthenticationPolicy(AuthTktAuthenticationPolicy):
 def get_user(request):
 	user_id = request.unauthenticated_userid
 	if user_id is not None:
-		user = UserRecordService.by_id(user_id, request)
+		user = request.dbsession.query(User).get(user_id)
 		return user
 
 def includeme(config):

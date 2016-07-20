@@ -16,6 +16,8 @@ from .CategoryType import CategoryType
 from .CategoryQuestion import CategoryQuestion
 from .UserQuestion import UserQuestion
 from .UserCategory import UserCategory
+from .Follow import Follow
+
 
 
 # run configure_mappers after defining all of the models to ensure

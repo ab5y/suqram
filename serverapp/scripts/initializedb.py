@@ -66,8 +66,8 @@ def main(argv=sys.argv):
 
     chaptercategorytype = CategoryType(name='chapter')
     multichoice = QuestionType(name='multiplechoice')
-    adminuser = UserType(name='admin')
-    regularuser = UserType(name='regular')
+    teacheruser = UserType(name='Teacher')
+    studentuser = UserType(name='Student')
     with transaction.manager:
         dbsession = get_tm_session(session_factory, transaction.manager)
         print 'User Type Table: ', str(UserType.__table__)
@@ -75,20 +75,24 @@ def main(argv=sys.argv):
         print 'Category Type Table', str(CategoryType.__table__)
         dbsession.add(chaptercategorytype)
         dbsession.add(multichoice)
-        dbsession.add(adminuser)
-        dbsession.add(regularuser)
+        dbsession.add(teacheruser)
+        dbsession.add(studentuser)
         dbsession.flush()
-        user = User(name='admin', full_name='admin user', type_id=adminuser.id)
+        
+        user = User(name='sudha', full_name='Sudha Sankaran', type_id=teacheruser.id)
         user.set_password('abc123')
-        chaptercategory = Category(name='TM', type_id=chaptercategorytype.id)
         dbsession.add(user)
+        dbsession.flush()
+        
+        chaptercategory = Category(name='TM', type_id=chaptercategorytype.id, creator_id=user.id)
         dbsession.add(chaptercategory)
         dbsession.flush()
+        
         print 'Chapter category type is CategoryType id: ', chaptercategorytype.id
         print 'TM Chapter category is Category id: ', chaptercategory.id
         print 'multichoice is QuestionType id: ', multichoice.id
-        print 'admin is UserType id: ', adminuser.id
-        print 'regular is UserType id: ', regularuser.id
+        print 'Teacher is UserType id: ', teacheruser.id
+        print 'Student is UserType id: ', studentuser.id
 
         # Get Questions and Options from Excel File
         table = 'Sheet1'

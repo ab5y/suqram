@@ -16,8 +16,8 @@ class UserTypeRecordService(object):
 			return request.dbsession.query(UserType).order_by(sa.desc(UserType.id))
 
 	@classmethod
-	def by_id(cls, id, request=None):
-		return UserType.query.get(id)
+	def by_id(cls, id, request):
+		return request.dbsession.query(UserType).get(id)
 
 	@classmethod
 	def by_name(cls, name, request):
