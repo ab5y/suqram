@@ -94,26 +94,26 @@ def main(argv=sys.argv):
         print 'Teacher is UserType id: ', teacheruser.id
         print 'Student is UserType id: ', studentuser.id
 
-        # Get Questions and Options from Excel File
-        table = 'Sheet1'
-        header = 'Sl. No.'
-        ws = read_from(EXCEL_FILE_NAME, table)
-        for row in ws.rows:
-            if row[0].value != header and row[2].value != None:
-                category = row[1].value
-                question = Question(question=row[2].value, type_id=multichoice.id)
-                dbsession.add(question)
-                dbsession.flush()
-                if category == 'TM':
-                    dbsession.add(CategoryQuestion(category_id=chaptercategory.id, question_id=question.id))
-                correct_option = row[7].value
-                # print 'Correct option for question ', question.question, 'is ', correct_option
-                q_options = []
-                q_options.append(Option(option=row[3].value, question_id=question.id, isCorrectAnswer=False))
-                q_options.append(Option(option=row[4].value, question_id=question.id, isCorrectAnswer=False))
-                q_options.append(Option(option=row[5].value, question_id=question.id, isCorrectAnswer=False))
-                q_options.append(Option(option=row[6].value, question_id=question.id, isCorrectAnswer=False))
-                q_options[ord(correct_option)-65].isCorrectAnswer = True
-                dbsession.add_all(q_options)
+        # # Get Questions and Options from Excel File
+        # table = 'Sheet1'
+        # header = 'Sl. No.'
+        # ws = read_from(EXCEL_FILE_NAME, table)
+        # for row in ws.rows:
+        #     if row[0].value != header and row[2].value != None:
+        #         category = row[1].value
+        #         question = Question(question=row[2].value, type_id=multichoice.id)
+        #         dbsession.add(question)
+        #         dbsession.flush()
+        #         if category == 'TM':
+        #             dbsession.add(CategoryQuestion(category_id=chaptercategory.id, question_id=question.id))
+        #         correct_option = row[7].value
+        #         # print 'Correct option for question ', question.question, 'is ', correct_option
+        #         q_options = []
+        #         q_options.append(Option(option=row[3].value, question_id=question.id, isCorrectAnswer=False))
+        #         q_options.append(Option(option=row[4].value, question_id=question.id, isCorrectAnswer=False))
+        #         q_options.append(Option(option=row[5].value, question_id=question.id, isCorrectAnswer=False))
+        #         q_options.append(Option(option=row[6].value, question_id=question.id, isCorrectAnswer=False))
+        #         q_options[ord(correct_option)-65].isCorrectAnswer = True
+        #         dbsession.add_all(q_options)
 
         dbsession.flush()
