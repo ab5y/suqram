@@ -29,22 +29,6 @@ from ..models.services.UserQuestionRecordService import UserQuestionRecordServic
 from ..models.services.UserRecordService import UserRecordService
 from ..models.services.UserTypeRecordService import UserTypeRecordService
 
-
-@view_config(route_name='home', renderer='../templates/mytemplate.jinja2')
-def my_view(request):
-    try:
-        query = request.dbsession.query(User)
-        one = query.filter(User.name == 'one').first()
-    except DBAPIError:
-        return Response(db_err_msg, content_type='text/plain', status=500)
-    return {'one': one, 'project': 'serverapp'}
-
-@view_config(route_name='hello', renderer='string')
-def hello(request):
-    if request.method == 'POST':
-        print 'ooh it tickles!'
-    return 'Hello World!'
-
 @view_config(route_name='user_types', renderer='json')
 def user_types(request):
     user = request.user
