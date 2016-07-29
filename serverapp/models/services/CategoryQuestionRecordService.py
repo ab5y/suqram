@@ -15,8 +15,8 @@ class CategoryQuestionRecordService(object):
 		return request.dbsession.query(CategoryQuestion).order_by(sa.desc(CategoryQuestion.id))
 
 	@classmethod
-	def by_id(cls, id, request=None):
-		return CategoryQuestion.query.get(id);
+	def by_id(cls, id, request):
+		return request.dbsession.query(CategoryQuestion).get(id);
 
 	@classmethod
 	def by_category_id(cls, category_id, request):

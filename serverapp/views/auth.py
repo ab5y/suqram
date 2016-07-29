@@ -34,7 +34,7 @@ def login(request):
 		if user is not None and user.check_password(password):
 			headers = remember(request, user.id)
 			okResponse = HTTPOk(headers=headers)
-			okResponse.body = "Login success"
+			okResponse.body = "Login success. UserType:"+str(user.type_id)
 			return okResponse
 		else:
 			badRequestResponse = HTTPBadRequest()

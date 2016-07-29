@@ -16,7 +16,7 @@ from sqlalchemy.exc import DBAPIError
 import transaction
 import zope.sqlalchemy
 
-from ..models import Follow, User, UserType, UserQuestion, UserCategory
+from ..models import Category, CategoryQuestion, Follow, Option, Question, User, UserType, UserQuestion, UserCategory
 from ..models.services.CategoryQuestionRecordService import CategoryQuestionRecordService
 from ..models.services.CategoryRecordService import CategoryRecordService
 from ..models.services.CategoryTypeRecordService import CategoryTypeRecordService
@@ -63,7 +63,7 @@ def category_types(request):
         raise HTTPForbidden
     if request.method == 'GET':
         category_types = CategoryTypeRecordService.all(request)
-        json_obj = list_to_json(category_types)
+        json_obj = list_to_json(category_types, 'category_types')
         return json_obj
 
 @view_config(route_name='question_types', renderer='json')
@@ -73,7 +73,7 @@ def question_types(request):
         raise HTTPForbidden
     if request.method == 'GET':
         question_types = QuestionTypeRecordService.all(request)
-        json_obj = list_to_json(question_types)
+        json_obj = list_to_json(question_types, 'question_types')
         return json_obj
 
 @view_config(route_name='users', renderer='json')
@@ -87,7 +87,10 @@ def users(request):
             usertype = UserTypeRecordService.by_id(int(data['user_type_id']), request)
             users = UserRecordService.by_type_id(int(data['user_type_id']), request)
             return list_to_json(users, usertype.name)
-
+        if 'user_id' in data:
+            user_to_ret = UserRecordService.by_id(int(data['user_id']), request)
+            # return list_to_json([user], 'user')
+            return json.loads('{"user":'+json.dumps(user_to_ret.as_dict())+'}')
 
 @view_config(route_name="followees", renderer='json')
 def followees(request):
@@ -133,6 +136,24 @@ def num_categories(request):
             categories = CategoryRecordService.by_creator_id(int(data['creator_id']), request)
             return json.loads('{"num_categories":'+str(len(categories))+'}')
 
+@view_config(route_name='num_user_questions', renderer='json')
+def num_user_questions(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+    if request.method == 'GET':
+        data = request.params
+        if 'user_category_id' in data:
+            user_questions = UserQuestionRecordService.by_user_category_id(int(data['user_category_id']), request)
+            return json.loads(
+                '{"num_user_questions":'+
+                str(len(user_questions))+
+                ', "user_category_id":'+
+                data['user_category_id']+
+                '}'
+                )
+
+
 @view_config(route_name='categories', renderer='json')
 def categories(request):
     user = request.user
@@ -146,6 +167,24 @@ def categories(request):
         categories = CategoryRecordService.by_creator_id(user.id, request)
         json_obj = list_to_json(categories, 'categories')
         return json_obj
+
+    if request.method == 'POST':
+        data = json.loads(json.dumps(request.json))
+        category_name = ''
+        category_type_id = 0
+        if 'category_name' in data:
+            category_name = data['category_name']
+        if 'category_type_id' in data:
+            category_type_id = data['category_type_id']
+        if len(category_name) > 0 and category_type_id > 0:
+            newcategory = Category(name=category_name, type_id=category_type_id, creator_id=user.id)
+            with transaction.manager:
+                zope.sqlalchemy.register(request.dbsession, transaction_manager=transaction.manager)
+                request.dbsession.add(newcategory)
+                transaction.commit()
+            responseCreated = HTTPCreated()
+            responseCreated.body = "category created"
+            return responseCreated
 
 @view_config(route_name='usercategories', renderer='json')
 def usercategories(request):
@@ -168,6 +207,31 @@ def userquestions(request):
         if 'user_category_id' in data:
             userquestions = UserQuestionRecordService.by_user_category_id(int(data['user_category_id']), request)
             return list_to_json(userquestions, 'userquestions')
+
+@view_config(route_name='categoryquestions', renderer='json')
+def categoryquestions(request):
+    user = request.user
+    if user is None:
+        raise HTTPForbidden
+    if request.method == 'GET':
+        data = request.params
+        if 'category_id' in data:
+            categoryquestions = CategoryQuestionRecordService.by_category_id(int(data['category_id']), request)
+        elif 'question_id' in data:
+            categoryquestions = CategoryQuestionRecordService.by_question_id(int(data['question_id']), request)
+        return list_to_json(categoryquestions, 'categoryquestions')
+
+    elif request.method == 'POST':
+        data = json.loads(json.dumps(request.json))
+        if 'category_id' and 'question_id' in data:
+            categoryquestion = CategoryQuestion(category_id=data['category_id'], question_id=data['question_id'])
+            with transaction.manager:
+                zope.sqlalchemy.register(request.dbsession, transaction_manager=transaction.manager)
+                request.dbsession.add(categoryquestion)
+                transaction.commit()
+            responseCreated = HTTPCreated()
+            responseCreated.body = "categoryquestion created"
+            return responseCreated
 
 @view_config(route_name='questions', renderer='json')
 def questions(request):
@@ -193,6 +257,19 @@ def questions(request):
         json_obj = list_to_json(questions, 'questions')
         return json_obj
 
+    if request.method == 'POST':
+        data = json.loads(json.dumps(request.json))
+        if 'question' and 'type_id' in data:
+            question = Question(question=data['question'], type_id=data['type_id'])
+            id = 0
+            with transaction.manager:
+                zope.sqlalchemy.register(request.dbsession, transaction_manager=transaction.manager)
+                request.dbsession.add(question)
+                request.dbsession.flush()
+                id = question.id
+                transaction.commit()
+            return json.loads('{"created_question_id":'+str(id)+'}')
+
 @view_config(route_name='options', renderer='json')
 def options(request):
     user = request.user
@@ -207,11 +284,30 @@ def options(request):
             options = OptionRecordService.by_question_id(int(data['question_id']), request)
             return list_to_json(options, 'options')
         if 'correct_answer_question_id' in data:
-            options = OptionRecordService.correct_answer_by_question_id(int(data['correct_answer_question_id']))
-            return list_to_json(options)
+            options = OptionRecordService.correct_answer_by_question_id(int(data['correct_answer_question_id']), request)
+            return list_to_json(options, 'correctoptions')
         # Return all options if no parameter specified
         options = OptionRecordService.all(request)
         return list_to_json(options)
+
+    if request.method == 'POST':
+        data = json.loads(json.dumps(request.json))
+        if 'options' and 'question_id' in data:
+            question_id = data['question_id']
+            optionsJsonArray = data['options']
+            for optionJson in optionsJsonArray:
+                option = Option(
+                    option=optionJson['option'],
+                    isCorrectAnswer=optionJson['isCorrectAnswer'],
+                    question_id=question_id,
+                    )
+                with transaction.manager:
+                    zope.sqlalchemy.register(request.dbsession, transaction_manager=transaction.manager)
+                    request.dbsession.add(option)
+                    transaction.commit()
+            responseCreated = HTTPCreated()
+            responseCreated.body = "options created"
+            return responseCreated
 
 @view_config(route_name='answers', renderer='json')
 def answers(request):
@@ -227,7 +323,7 @@ def answers(request):
         if 'categoryid' in data:
             if int(data['categoryid']) > 0:
                 userCategory = UserCategory(
-                    user_id=int(data['userid']), 
+                    user_id=user.id, 
                     category_id=int(data['categoryid']), 
                     started_at=parse(data['starttime'])
                     )
@@ -237,9 +333,9 @@ def answers(request):
         for key in answers:
             request.dbsession.add(
                 UserQuestion(
-                    user_id=int(data['userid']), 
-                    question_id=int(data['questionid']), 
-                    user_category_id=user_category_id, 
+                    user_id=user.id,
+                    question_id=key,
+                    user_category_id=user_category_id,
                     selected_option_id=answers[key],
                     )
                 )

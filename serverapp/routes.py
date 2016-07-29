@@ -15,5 +15,7 @@ def includeme(config):
     config.add_route('categories', 'categories')
     config.add_route('usercategories', 'usercategories')
     config.add_route('userquestions', 'userquestions')
+    config.add_route('categoryquestions', 'categoryquestions')
     config.add_route('followees', 'followees')
     config.add_route('num_categories', 'num_categories')
+    config.add_route('num_user_questions','num_user_questions')
