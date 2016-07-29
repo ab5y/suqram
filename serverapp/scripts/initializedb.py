@@ -32,16 +32,16 @@ from ..models import (
     CategoryQuestion,
     )
 
-ROOT_FOLDER = os.path.join(os.getcwd(), 'serverapp')
-DATA_FOLDER = os.path.join(ROOT_FOLDER, 'scripts')
-EXCEL_FILE_NAME = 'PMP Questions Bank.xlsx'
+# ROOT_FOLDER = os.path.join(os.getcwd(), 'serverapp')
+# DATA_FOLDER = os.path.join(ROOT_FOLDER, 'scripts')
+# EXCEL_FILE_NAME = 'PMP Questions Bank.xlsx'
 
-def get_filepath(filename):
-    return os.path.join(DATA_FOLDER, filename)
+# def get_filepath(filename):
+#     return os.path.join(DATA_FOLDER, filename)
 
-def read_from(filename, sheet):
-    wb = load_workbook(filename = get_filepath(filename), read_only=True)
-    return wb[sheet]
+# def read_from(filename, sheet):
+#     wb = load_workbook(filename = get_filepath(filename), read_only=True)
+#     return wb[sheet]
 
 
 def usage(argv):
