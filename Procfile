@@ -1,1 +1,1 @@
-web: gunicorn gettinstarted.wsgi --log-file -
+web: python runapp.py runserver 0.0.0.0:$PORT
