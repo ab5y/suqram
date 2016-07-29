@@ -13,8 +13,6 @@ from sqlalchemy.orm import relationship
 from .meta import Base
 
 class User(Base):
-	__tablename__ = 'users'
-	
 	name = Column(Text, unique=True, nullable=False)
 	full_name = Column(Text)
 	password_hash = Column(Text, nullable=False)
