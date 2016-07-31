@@ -26,7 +26,6 @@ pytest==2.9.2
 pytest-cov==2.2.1
 python-dateutil==2.5.3
 repoze.lru==0.6
--e git+https://github.com/ab5y/suqram.git@b5521a14c56891e10ba8e877f91daafeb1937afa#egg=serverapp
 six==1.10.0
 SQLAlchemy==1.0.13
 transaction==1.6.1
