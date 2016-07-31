@@ -53,7 +53,7 @@ def main(argv=sys.argv):
 
     session_factory = get_session_factory(engine)
 
-    chaptercategorytype = CategoryType(name='chapter')
+    chaptercategorytype = CategoryType(name='Chapter')
     multichoice = QuestionType(name='multiplechoice')
     teacheruser = UserType(name='Teacher')
     studentuser = UserType(name='Student')
@@ -68,20 +68,20 @@ def main(argv=sys.argv):
         dbsession.add(studentuser)
         dbsession.flush()
         
-        user = User(name='sudha', full_name='Sudha Sankaran', type_id=teacheruser.id)
-        user.set_password('abc123')
-        dbsession.add(user)
-        dbsession.flush()
+        # user = User(name='sudha', full_name='Sudha Sankaran', type_id=teacheruser.id)
+        # user.set_password('abc123')
+        # dbsession.add(user)
+        # dbsession.flush()
         
-        chaptercategory = Category(name='TM', type_id=chaptercategorytype.id, creator_id=user.id)
-        dbsession.add(chaptercategory)
-        dbsession.flush()
+        # chaptercategory = Category(name='TM', type_id=chaptercategorytype.id, creator_id=user.id)
+        # dbsession.add(chaptercategory)
+        # dbsession.flush()
         
-        print 'Chapter category type is CategoryType id: ', chaptercategorytype.id
-        print 'TM Chapter category is Category id: ', chaptercategory.id
-        print 'multichoice is QuestionType id: ', multichoice.id
-        print 'Teacher is UserType id: ', teacheruser.id
-        print 'Student is UserType id: ', studentuser.id
+        # print 'Chapter category type is CategoryType id: ', chaptercategorytype.id
+        # print 'TM Chapter category is Category id: ', chaptercategory.id
+        # print 'multichoice is QuestionType id: ', multichoice.id
+        # print 'Teacher is UserType id: ', teacheruser.id
+        # print 'Student is UserType id: ', studentuser.id
 
 
         dbsession.flush()

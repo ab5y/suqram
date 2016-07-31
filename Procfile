@@ -1,2 +1,2 @@
-web: python setup.py produce
+web: python setup.py develop
 web: python runapp.py
