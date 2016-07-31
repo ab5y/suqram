@@ -32,6 +32,16 @@ from ..models import (
     CategoryQuestion,
     )
 
+# ROOT_FOLDER = os.path.join(os.getcwd(), 'serverapp')
+# DATA_FOLDER = os.path.join(ROOT_FOLDER, 'scripts')
+# EXCEL_FILE_NAME = 'PMP Questions Bank.xlsx'
+
+# def get_filepath(filename):
+#     return os.path.join(DATA_FOLDER, filename)
+
+# def read_from(filename, sheet):
+#     wb = load_workbook(filename = get_filepath(filename), read_only=True)
+#     return wb[sheet]
 
 def usage(argv):
     cmd = os.path.basename(argv[0])
@@ -83,5 +93,25 @@ def main(argv=sys.argv):
         # print 'Teacher is UserType id: ', teacheruser.id
         # print 'Student is UserType id: ', studentuser.id
 
-
-        dbsession.flush()
+        # # Get Questions and Options from Excel File
+        # table = 'Sheet1'
+        # header = 'Sl. No.'
+        # ws = read_from(EXCEL_FILE_NAME, table)
+        # for row in ws.rows:
+        #     if row[0].value != header and row[2].value != None:
+        #         category = row[1].value
+        #         question = Question(question=row[2].value, type_id=multichoice.id)
+        #         dbsession.add(question)
+        #         dbsession.flush()
+        #         if category == 'TM':
+        #             dbsession.add(CategoryQuestion(category_id=chaptercategory.id, question_id=question.id))
+        #         correct_option = row[7].value
+        #         # print 'Correct option for question ', question.question, 'is ', correct_option
+        #         q_options = []
+        #         q_options.append(Option(option=row[3].value, question_id=question.id, isCorrectAnswer=False))
+        #         q_options.append(Option(option=row[4].value, question_id=question.id, isCorrectAnswer=False))
+        #         q_options.append(Option(option=row[5].value, question_id=question.id, isCorrectAnswer=False))
+        #         q_options.append(Option(option=row[6].value, question_id=question.id, isCorrectAnswer=False))
+        #         q_options[ord(correct_option)-65].isCorrectAnswer = True
+        #         dbsession.add_all(q_options)
+        # dbsession.flush()
