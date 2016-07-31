@@ -31,14 +31,19 @@ def login(request):
 		if 'password' in data:
 			password = data['password']
 		user = UserRecordService.by_name(login, request)
-		if user is not None and user.check_password(password):
-			headers = remember(request, user.id)
-			okResponse = HTTPOk(headers=headers)
-			okResponse.body = "Login success. UserType:"+str(user.type_id)
-			return okResponse
+		if user is not None:
+			if user.check_password(password):
+				headers = remember(request, user.id)
+				okResponse = HTTPOk(headers=headers)
+				okResponse.body = "Login success. UserType:"+str(user.type_id)
+				return okResponse
+			else:
+				badRequestResponse = HTTPBadRequest()
+				badRequestResponse.body = 'Login fail. User name or password incorrect.'
+				return badRequestResponse
 		else:
 			badRequestResponse = HTTPBadRequest()
-			badRequestResponse.body = 'Login fail. User name or password incorrect.'
+			badRequestResponse.body = 'Login fail. User does not exist.'
 			return badRequestResponse
 
 @view_config(route_name='logout')
